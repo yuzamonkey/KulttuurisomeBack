@@ -2,10 +2,10 @@
   "name": "kultturisomebackend",
   "version": "1.0.0",
   "description": "Backend for Kulttuurisome project",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "start": "NODE_ENV=production node index.js",
-    "dev": "NODE_ENV=development nodemon index.js",
+    "start": "NODE_ENV=production ts-node index.ts",
+    "dev": "NODE_ENV=development ts-node-dev index.ts",
     "test": "NODE_ENV=test jest --verbose --runInBand"
   },
   "repository": {
@@ -27,12 +27,17 @@
     "graphql": "^15.5.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.13",
-    "mongoose-unique-validator": "^2.0.3"
+    "mongoose-unique-validator": "^2.0.3",
+    "ts-node": "^10.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^15.12.2",
     "jest": "^27.0.4",
-    "nodemon": "^2.0.7",
-    "supertest": "^6.1.3"
+    "supertest": "^6.1.3",
+    "ts-node-dev": "^1.1.6",
+    "typescript": "^4.3.4"
   },
   "jest": {
     "testEnvironment": "node"

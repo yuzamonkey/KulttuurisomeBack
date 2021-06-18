@@ -1,3 +1,5 @@
+import { AuthenticationError, IResolvers, UserInputError } from "apollo-server"
+
 require('dotenv')
 const bcrypt = require('bcrypt')
 
@@ -10,19 +12,19 @@ const { Kind } = require('graphql/language')
 
 const JWT_SECRET = process.env.JWT_SECRET
 
-const resolvers = {
+const resolvers: IResolvers = {
   Date: new GraphQLScalarType({
     name: "Date",
     description: "Date scalar (Jusa has done this)",
-    parseValue(value) {
-      return new Date(value)
+    parseValue(value: Date) {
+      return new Date(value) //value from the client
     },
-    serialize(value) {
-      return value
+    serialize(value: Date) {
+      return value //value sent to client
     },
-    parseLiteral(ast) {
-      if (ast.kind === Kind.INT) {
-        return new Date(ast.value)
+    parseLiteral(ast: any) {
+      if (ast.kind === Kind.STRING) {
+        return new Date(ast.value) //ast value is always in string format
       }
       return null
     }

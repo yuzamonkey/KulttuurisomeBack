@@ -1,3 +1,4 @@
+export {}; //https://medium.com/@muravitskiy.mail/cannot-redeclare-block-scoped-variable-varname-how-to-fix-b1c3d9cc8206
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
 
@@ -22,14 +23,14 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true,
   .then(() => {
     console.log('connected to MongoDB')
   })
-  .catch((error) => {
+  .catch((error:any) => {
     console.log('error connection to MongoDB:', error.message)
   })
 
 const server = new ApolloServer({
   typeDefs, //sovelluksen GQL-skeema
   resolvers, //resolverit, eli koodi joka määrittelee miten kyselyihin vastataan
-  context: async ({ req }) => {
+  context: async ({ req }: any) => {
     const auth = req ? req.headers.authorization : null
     console.log("AUTH", auth)
     if (auth && auth.toLowerCase().startsWith('bearer ')) {
@@ -46,6 +47,6 @@ const server = new ApolloServer({
   }
 })
 
-server.listen().then(({ url }) => {
+server.listen().then(({ url }: any) => {
   console.log(`Server ready at ${url}`)
 })
