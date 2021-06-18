@@ -1,0 +1,40 @@
+{
+  "name": "kultturisomebackend",
+  "version": "1.0.0",
+  "description": "Backend for Kulttuurisome project",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_ENV=production node index.js",
+    "dev": "NODE_ENV=development nodemon index.js",
+    "test": "NODE_ENV=test jest --verbose --runInBand"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuzamonkey/KulttuurisomeBack.git"
+  },
+  "author": "Jusa Mankki",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yuzamonkey/KulttuurisomeBack/issues"
+  },
+  "homepage": "https://github.com/yuzamonkey/KulttuurisomeBack#readme",
+  "dependencies": {
+    "apollo-server": "^2.25.1",
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "graphql": "^15.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.12.13",
+    "mongoose-unique-validator": "^2.0.3"
+  },
+  "devDependencies": {
+    "jest": "^27.0.4",
+    "nodemon": "^2.0.7",
+    "supertest": "^6.1.3"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
