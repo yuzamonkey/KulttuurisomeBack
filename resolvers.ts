@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt')
 
 const Jobquery = require('./models/jobquery')
 const User = require('./models/user')
+const Conversation = require('./models/conversation')
 const jwt = require('jsonwebtoken')
 
 const { GraphQLScalarType } = require('graphql')
@@ -37,11 +38,20 @@ const resolvers: IResolvers = {
     allUsers: (root, args) => {
       return User.find({}).populate('jobQueries')
     },
-    findQueries: (root, args) =>
-      Jobquery.find({ content: args.content }).populate('user'),
+    findQueries: (root, args) => {
+      return Jobquery.find({ content: args.content }).populate('user')
+    },
     findUser: (root, args) => {
       console.log("ID", args.id)
       return User.findOne({ _id: args.id }).populate('jobQueries')
+    },
+
+    allConversations: (root, args) => {
+      return Conversation.find({}).populate('users')
+    },
+
+    findConversation: (root, args) => {
+      return Conversation.findOne({ _id: args.id }).populate('users')
     },
     me: (root, args, context) => {
       //return context.currentUser
@@ -61,13 +71,13 @@ const resolvers: IResolvers = {
       })
       console.log(`NEW not saved USER: ${user}`)
 
-      return user.save()
-        .catch(error => {
-          console.log("ERROR AT USER SAVE MUTATION")
-          throw new UserInputError(error.message, {
-            invalidArgs: args,
-          })
+      try {
+        return user.save()
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
         })
+      }
     },
 
     login: async (root, args) => {
@@ -108,23 +118,79 @@ const resolvers: IResolvers = {
       console.log(`NEW JOBQUERY: ${newQuery}`)
 
       try {
-        const foo = await newQuery.save()
+        const savedQuery = await newQuery.save()
         currentUser.jobQueries = currentUser.jobQueries.concat(newQuery)
         await currentUser.save()
-        return foo
+        return savedQuery
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args,
         })
       }
-      // return newQuery.save()
-      //   .catch(error => {
-      //     console.log("ERROR AT NEW QUERY")
-      //     throw new UserInputError(error.message, {
-      //       invalidArgs: args,
-      //     })
-      //   })
+    },
+
+    createConversation: async (root, args, context) => {
+      const currentUser = context.currentUser
+
+      if (!currentUser) {
+        console.log(`Not authenticated user`)
+        throw new AuthenticationError("not authenticated")
+      }
+
+      const currentUserId = currentUser.id
+      const receiverId = args.receiverId
+      const currentUserName = currentUser.username
+      const receiverName = await User.findOne({ _id: receiverId })
+
+      console.log("sender", currentUserName, currentUserId)
+      console.log("receiver", receiverName, receiverId)
+
+      const newConversation = new Conversation({
+        users: [currentUser.id, receiverId]
+      })
+
+      try {
+        const savedConversation = await newConversation.save()
+        console.log("SAVED CONVERSATION SUCCESS, ", savedConversation)
+        return savedConversation
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        })
+      }
+    },
+
+    sendMessage: async (root, args, context) => {
+      const currentUser = context.currentUser
+
+      if (!currentUser) {
+        console.log(`Not authenticated user`)
+        throw new AuthenticationError("not authenticated")
+      }
+
+      const content = args.body
+      const date = new Date()
+      const userId = currentUser.id
+      const conversationId = args.conversationId
+
+      try {
+
+        const newMessage = { body: content }
+
+        const conversation = await Conversation.findOne({ _id: conversationId })
+        conversation.messages = conversation.messages.concat(newMessage)
+
+        await conversation.save()
+        console.log("CONVERSATION MESSAGES NOW", conversation.messages)
+        return conversation
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        })
+      }
+
     }
+
   }
 }
 

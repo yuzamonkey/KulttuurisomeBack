@@ -1,4 +1,4 @@
-export {}; //https://medium.com/@muravitskiy.mail/cannot-redeclare-block-scoped-variable-varname-how-to-fix-b1c3d9cc8206
+export { }; //https://medium.com/@muravitskiy.mail/cannot-redeclare-block-scoped-variable-varname-how-to-fix-b1c3d9cc8206
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
 
@@ -10,10 +10,17 @@ const resolvers = require('./resolvers')
 
 const User = require('./models/user');
 
-//const MONGODB_URI = process.env.MONGODB_URI
-const MONGODB_URI = process.env.NODE_ENV === 'test' 
-  ? process.env.TEST_MONGODB_URI
-  : process.env.MONGODB_URI
+const environmentUri = () => {
+  if (process.env.NODE_ENV === 'test') {
+    return process.env.TEST_MONGODB_URI
+  } else if (process.env.NODE_ENV === 'development') {
+    return process.env.DEV_MONGODB_URI
+  } else {
+    return process.env.MONGODB_URI
+  }
+}
+
+const MONGODB_URI = environmentUri()
 
 console.log('connecting to', MONGODB_URI)
 
@@ -23,25 +30,23 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true,
   .then(() => {
     console.log('connected to MongoDB')
   })
-  .catch((error:any) => {
+  .catch((error: any) => {
     console.log('error connection to MongoDB:', error.message)
   })
 
 const server = new ApolloServer({
   typeDefs, //sovelluksen GQL-skeema
   resolvers, //resolverit, eli koodi joka määrittelee miten kyselyihin vastataan
-  context: async ({ req }: any) => {
+  context: async ({ req }: any) => { //An object (or a function that creates an object) that's passed to every resolver that executes for a particular operation
     const auth = req ? req.headers.authorization : null
-    console.log("AUTH", auth)
     if (auth && auth.toLowerCase().startsWith('bearer ')) {
-      console.log("YES, STARTS WITH bearer")
       const decodedToken = jwt.verify(
         auth.substring(7), JWT_SECRET
       )
       const currentUser = await User
         .findById(decodedToken.id)
-      console.log("YES, CURRENT USER", currentUser)
-      console.log()
+      const time = new Date()
+      console.log(currentUser.username, "is logged in at", time, "\n")
       return { currentUser }
     }
   }

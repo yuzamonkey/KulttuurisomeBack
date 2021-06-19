@@ -1,16 +1,20 @@
 const { gql } = require('apollo-server')
-// const { DateTimeResolver } = require('graphql-scalars');
-
-// const typeDefs = [
-//   DateTimeResolver,
-//   // other typeDefs
-// ];
 
 const typeDefs = gql`
   scalar Date
 
+  type Message {
+    body: String
+  }
+
+  type Conversation {
+    id: ID!
+    users: [User!]!
+    messages: [Message]!
+  }
+
   type Jobquery {
-    id: String!
+    id: ID!
     content: String!
     date: Date!
     user: User!
@@ -33,6 +37,8 @@ const typeDefs = gql`
     allUsers: [User]
     findQueries(content: String!): [Jobquery],
     findUser(id: ID!): User
+    allConversations: [Conversation]
+    findConversation(id: ID!): Conversation
     me: User,
   }
 
@@ -48,6 +54,13 @@ const typeDefs = gql`
     createQuery(
       content: String!
     ): Jobquery
+    createConversation(
+      receiverId: ID!
+    ): Conversation
+    sendMessage(
+      conversationId: ID!
+      body: String!
+    ): Conversation
   }
 `
 
