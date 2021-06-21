@@ -4,6 +4,7 @@ const typeDefs = gql`
   scalar Date
 
   type Message {
+    id: ID!
     body: String
     sender: User!
   }
@@ -62,7 +63,7 @@ const typeDefs = gql`
     sendMessage(
       conversationId: ID!
       body: String!
-    ): Message
+    ): Conversation
   }
 `
 

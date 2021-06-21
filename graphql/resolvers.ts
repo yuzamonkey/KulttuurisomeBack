@@ -3,9 +3,9 @@ import { AuthenticationError, IResolvers, UserInputError } from "apollo-server"
 require('dotenv')
 const bcrypt = require('bcrypt')
 
-const Jobquery = require('./models/jobquery')
-const User = require('./models/user')
-const Conversation = require('./models/conversation')
+const Jobquery = require('../models/jobquery')
+const User = require('../models/user')
+const Conversation = require('../models/conversation')
 const jwt = require('jsonwebtoken')
 
 const { GraphQLScalarType } = require('graphql')

@@ -2,11 +2,11 @@ export { }; //https://medium.com/@muravitskiy.mail/cannot-redeclare-block-scoped
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
 
-const { ApolloServer, UserInputError, gql } = require('apollo-server')
+const { ApolloServer } = require('apollo-server')
 const mongoose = require('mongoose')
 
-const typeDefs = require('./schema')
-const resolvers = require('./resolvers')
+const typeDefs = require('./graphql/schema')
+const resolvers = require('./graphql/resolvers')
 
 const User = require('./models/user');
 
