@@ -43,20 +43,33 @@ const resolvers: IResolvers = {
     },
     findUser: (root, args) => {
       console.log("ID", args.id)
-      return User.findOne({ _id: args.id }).populate('jobQueries')
+      return User.findOne({ _id: args.id })
+        .populate('jobQueries')
+        .populate('conversations')
     },
-
     allConversations: (root, args) => {
       return Conversation.find({}).populate('users')
     },
-
     findConversation: (root, args) => {
       return Conversation.findOne({ _id: args.id }).populate('users')
     },
     me: (root, args, context) => {
       //return context.currentUser
-      return User.findOne({ username: context.currentUser.username }).populate('jobQueries')
+      return User.findOne({ _id: context.currentUser._id })
+        .populate('jobQueries')
+        .populate('conversations')
     },
+  },
+  User: {
+    conversations: async (root) => {
+      console.log("CONVERSATIONS root: ", root)
+      const conversationIds = root.conversations.map((c): any => c._id)
+      console.log("CONVERSAtiON IDS", conversationIds)
+      const conversations = await Conversation.find({
+        _id: { $in: conversationIds }
+      }).populate('users')
+      return conversations
+    }
   },
   Mutation: {
     createUser: async (root, args) => {
@@ -140,10 +153,10 @@ const resolvers: IResolvers = {
       const currentUserId = currentUser.id
       const receiverId = args.receiverId
       const currentUserName = currentUser.username
-      const receiverName = await User.findOne({ _id: receiverId })
+      const receiver = await User.findOne({ _id: receiverId })
 
       console.log("sender", currentUserName, currentUserId)
-      console.log("receiver", receiverName, receiverId)
+      console.log("receiver", receiver, receiverId)
 
       const newConversation = new Conversation({
         users: [currentUser.id, receiverId]
@@ -152,6 +165,10 @@ const resolvers: IResolvers = {
       try {
         const savedConversation = await newConversation.save()
         console.log("SAVED CONVERSATION SUCCESS, ", savedConversation)
+        currentUser.conversations = currentUser.conversations.concat(newConversation)
+        const savedUser = await currentUser.save()
+        receiver.conversations = receiver.conversations.concat(newConversation)
+        const savedReceiver = await receiver.save()
         return savedConversation
       } catch (error) {
         throw new UserInputError(error.message, {

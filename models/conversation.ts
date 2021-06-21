@@ -7,7 +7,9 @@ const conversationSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
-  messages: [{body: String}]
+  messages: [{
+    body: String
+  }]
 })
 
 conversationSchema.set('toJSON', {

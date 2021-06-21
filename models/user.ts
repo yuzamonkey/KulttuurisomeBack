@@ -1,4 +1,4 @@
-export {};
+export { };
 const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 
@@ -17,6 +17,10 @@ const schema = new mongoose.Schema({
   jobQueries: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Jobquery'
+  }],
+  conversations: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Conversation'
   }]
 })
 

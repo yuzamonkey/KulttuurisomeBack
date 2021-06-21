@@ -9,7 +9,7 @@ const typeDefs = gql`
 
   type Conversation {
     id: ID!
-    users: [User!]!
+    users: [User]!
     messages: [Message]!
   }
 
@@ -25,6 +25,7 @@ const typeDefs = gql`
     username: String!
     passwordHash: String!
     jobQueries: [Jobquery]
+    conversations: [Conversation]!
   }
 
   type Token {
