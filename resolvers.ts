@@ -51,7 +51,12 @@ const resolvers: IResolvers = {
       return Conversation.find({}).populate('users')
     },
     findConversation: (root, args) => {
-      return Conversation.findOne({ _id: args.id }).populate('users')
+      return Conversation.findOne({ _id: args.id })
+        .populate('users')
+        .populate({
+          path: 'messages',
+          populate: { path: 'sender' }
+        })
     },
     me: (root, args, context) => {
       //return context.currentUser
@@ -62,9 +67,7 @@ const resolvers: IResolvers = {
   },
   User: {
     conversations: async (root) => {
-      console.log("CONVERSATIONS root: ", root)
       const conversationIds = root.conversations.map((c): any => c._id)
-      console.log("CONVERSAtiON IDS", conversationIds)
       const conversations = await Conversation.find({
         _id: { $in: conversationIds }
       }).populate('users')
@@ -192,7 +195,10 @@ const resolvers: IResolvers = {
 
       try {
 
-        const newMessage = { body: content }
+        const newMessage = {
+          body: content,
+          sender: userId
+        }
 
         const conversation = await Conversation.findOne({ _id: conversationId })
         conversation.messages = conversation.messages.concat(newMessage)
