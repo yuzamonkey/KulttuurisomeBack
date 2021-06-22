@@ -1,11 +1,12 @@
 import { AuthenticationError, IResolvers, UserInputError } from "apollo-server"
+import { Conversation } from "../types/types"
 
 require('dotenv')
 const bcrypt = require('bcrypt')
 
-const Jobquery = require('../models/jobquery')
-const User = require('../models/user')
-const Conversation = require('../models/conversation')
+const JobqueryModel = require('../models/jobquery')
+const UserModel = require('../models/user')
+const ConversationModel = require('../models/conversation')
 const jwt = require('jsonwebtoken')
 
 const { GraphQLScalarType } = require('graphql')
@@ -31,57 +32,57 @@ const resolvers: IResolvers = {
     }
   }),
   Query: {
-    queryCount: () => Jobquery.collection.countDocuments(),
-    allQueries: (root, args) => {
-      return Jobquery.find({}).populate('user')
+    queryCount: () => JobqueryModel.collection.countDocuments(),
+    allQueries: (_root, _args) => {
+      return JobqueryModel.find({}).populate('user')
     },
-    allUsers: (root, args) => {
-      return User.find({}).populate('jobQueries')
+    allUsers: (_root, _args) => {
+      return UserModel.find({}).populate('jobQueries')
     },
-    findQueries: (root, args) => {
-      return Jobquery.find({ content: args.content }).populate('user')
+    findQueries: (_root, args) => {
+      return JobqueryModel.find({ content: args.content }).populate('user')
     },
-    findUser: (root, args) => {
+    findUser: (_root, args) => {
       console.log("ID", args.id)
-      return User.findOne({ _id: args.id })
+      return UserModel.findOne({ _id: args.id })
         .populate('jobQueries')
         .populate('conversations')
     },
-    allConversations: (root, args) => {
-      return Conversation.find({}).populate('users')
+    allConversations: (_root, _args) => {
+      return ConversationModel.find({}).populate('users')
     },
-    findConversation: (root, args) => {
-      return Conversation.findOne({ _id: args.id })
+    findConversation: (_root, args) => {
+      return ConversationModel.findOne({ _id: args.id })
         .populate('users')
         .populate({
           path: 'messages',
           populate: { path: 'sender' }
         })
     },
-    me: (root, args, context) => {
+    me: (_root, _args, context) => {
       //return context.currentUser
-      return User.findOne({ _id: context.currentUser._id })
+      return UserModel.findOne({ _id: context.currentUser._id })
         .populate('jobQueries')
         .populate('conversations')
     },
   },
   User: {
     conversations: async (root) => {
-      const conversationIds = root.conversations.map((conversation => conversation._id))
-      const conversations = await Conversation.find({
+      const conversationIds = root.conversations.map((c: Conversation) => c._id)
+      const conversations = await ConversationModel.find({
         _id: { $in: conversationIds }
       }).populate('users')
       return conversations
     }
   },
   Mutation: {
-    createUser: async (root, args) => {
+    createUser: async (_root, args) => {
       const username = args.username
 
       const saltRounds = 10
       const passwordHash = await bcrypt.hash(args.password, saltRounds)
 
-      const user = new User({
+      const user = new UserModel({
         username: username,
         passwordHash: passwordHash
       })
@@ -96,8 +97,8 @@ const resolvers: IResolvers = {
       }
     },
 
-    login: async (root, args) => {
-      const user = await User.findOne({ username: args.username })
+    login: async (_root, args) => {
+      const user = await UserModel.findOne({ username: args.username })
 
       if (!user || await bcrypt.compare(args.password, user.passwordHash) === false) {
         console.log("WRONG CREDENTIALS")
@@ -112,7 +113,7 @@ const resolvers: IResolvers = {
       return { value: jwt.sign(userForToken, JWT_SECRET) }
     },
 
-    createQuery: async (root, args, context) => {
+    createQuery: async (_root, args, context) => {
       const currentUser = context.currentUser
 
       if (!currentUser) {
@@ -125,7 +126,7 @@ const resolvers: IResolvers = {
       const userId = currentUser.id
       console.log("USER ID IN CREATE QUERY RESOLVER", userId)
 
-      const newQuery = new Jobquery({
+      const newQuery = new JobqueryModel({
         content: content,
         date: date,
         user: userId
@@ -145,7 +146,7 @@ const resolvers: IResolvers = {
       }
     },
 
-    createConversation: async (root, args, context) => {
+    createConversation: async (_root, args, context) => {
       const currentUser = context.currentUser
 
       if (!currentUser) {
@@ -156,12 +157,12 @@ const resolvers: IResolvers = {
       const currentUserId = currentUser.id
       const receiverId = args.receiverId
       const currentUserName = currentUser.username
-      const receiver = await User.findOne({ _id: receiverId })
+      const receiver = await UserModel.findOne({ _id: receiverId })
 
       console.log("sender", currentUserName, currentUserId)
       console.log("receiver", receiver, receiverId)
 
-      const newConversation = new Conversation({
+      const newConversation = new ConversationModel({
         users: [currentUser.id, receiverId]
       })
 
@@ -169,9 +170,9 @@ const resolvers: IResolvers = {
         const savedConversation = await newConversation.save()
         console.log("SAVED CONVERSATION SUCCESS, ", savedConversation)
         currentUser.conversations = currentUser.conversations.concat(newConversation)
-        const savedUser = await currentUser.save()
+        await currentUser.save()
         receiver.conversations = receiver.conversations.concat(newConversation)
-        const savedReceiver = await receiver.save()
+        await receiver.save()
         return savedConversation
       } catch (error) {
         throw new UserInputError(error.message, {
@@ -180,7 +181,7 @@ const resolvers: IResolvers = {
       }
     },
 
-    sendMessage: async (root, args, context) => {
+    sendMessage: async (_root, args, context) => {
       const currentUser = context.currentUser
 
       if (!currentUser) {
@@ -189,7 +190,7 @@ const resolvers: IResolvers = {
       }
 
       const content = args.body
-      const date = new Date()
+      //const date = new Date()
       const userId = currentUser.id
       const conversationId = args.conversationId
 
@@ -200,7 +201,7 @@ const resolvers: IResolvers = {
           sender: userId
         }
 
-        const conversation = await Conversation.findOne({ _id: conversationId })
+        const conversation = await ConversationModel.findOne({ _id: conversationId })
         conversation.messages = conversation.messages.concat(newMessage)
 
         await conversation.save()

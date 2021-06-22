@@ -26,6 +26,8 @@ const server = new ApolloServer({
       const time = new Date()
       console.log(currentUser.username, "is logged in at", time, "\n")
       return { currentUser }
+    } else {
+      return null
     }
   }
 })

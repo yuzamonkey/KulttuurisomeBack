@@ -1,24 +1,24 @@
 export interface Message {
-  id: Object
+  _id: Object
   body: String
   sender: User
 }
 
 export interface Conversation {
-  id: Object
+  _id: Object
   users: [User]
   messages: [Message]
 }
 
 export interface Jobquery {
-  id: Object
+  _id: Object
   content: String
   date: Date
   user: User
 }
 
 export interface User {
-  id: Object
+  _id: Object
   username: String
   passwordHash: String
   jobQueries: [Jobquery]
