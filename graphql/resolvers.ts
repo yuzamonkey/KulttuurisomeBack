@@ -67,7 +67,7 @@ const resolvers: IResolvers = {
   },
   User: {
     conversations: async (root) => {
-      const conversationIds = root.conversations.map((c): any => c._id)
+      const conversationIds = root.conversations.map((conversation => conversation._id))
       const conversations = await Conversation.find({
         _id: { $in: conversationIds }
       }).populate('users')

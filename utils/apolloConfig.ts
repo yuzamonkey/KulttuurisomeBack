@@ -1,19 +1,18 @@
-export { };
+export { }; //https://medium.com/@muravitskiy.mail/cannot-redeclare-block-scoped-variable-varname-how-to-fix-b1c3d9cc8206
 
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
 
 const { ApolloServer } = require('apollo-server')
 
-
-const mongoose = require('mongoose')
 const typeDefs = require('../graphql/schema')
 const resolvers = require('../graphql/resolvers')
-const JWT_SECRET = process.env.JWT_SECRET
+
 const User = require('../models/user');
-const connectTestingDB = require('../utils/testingEnvironment').connectDB
-//const apolloConfig = require('../utils/apolloConfig
-const apolloServer = new ApolloServer({
+
+const JWT_SECRET = process.env.JWT_SECRET
+
+const server = new ApolloServer({
   typeDefs, //sovelluksen GQL-skeema
   resolvers, //resolverit, eli koodi joka määrittelee miten kyselyihin vastataan
   context: async ({ req }: any) => { //An object (or a function that creates an object) that's passed to every resolver that executes for a particular operation
@@ -31,32 +30,10 @@ const apolloServer = new ApolloServer({
   }
 })
 
-beforeAll(async () => {
-  await connectTestingDB()
+server.listen().then(({ url }: any) => {
+  console.log(`Server ready at ${url}`)
 })
 
-afterAll(async () => {
-  await mongoose.connection.close()
-  console.log(apolloConfig.server)
-})
-
-test('something test', async () => {
-  const kolme = 3
-  expect(kolme).toBe(3)
-})
-
-describe('connections are up and running', () => {
-  test('correct database name', async () => {
-    const connectionName = await mongoose.connection.name
-    expect(connectionName).toBe(process.env.TEST_DB_NAME)
-  })
-})
-
-// describe('creating user', () => {
-//   test('create user', async () => {
-//     const username = 'testUser'
-//     const password = 'password'
-
-//   })
-// })
-
+module.exports = {
+  server
+}

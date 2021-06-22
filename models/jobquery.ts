@@ -25,6 +25,6 @@ jobquerySchema.set('toJSON', {
   }
 })
 
-
 jobquerySchema.plugin(uniqueValidator)
+
 module.exports = mongoose.model('Jobquery', jobquerySchema)
