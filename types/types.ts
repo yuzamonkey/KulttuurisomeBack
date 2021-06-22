@@ -1,26 +1,30 @@
-export interface Message {
+export interface IMessage {
   _id: Object
   body: String
-  sender: User
+  sender: IUser
 }
 
-export interface Conversation {
+export interface IConversation {
   _id: Object
-  users: [User]
-  messages: [Message]
+  users: [IUser]
+  messages: [IMessage]
 }
 
-export interface Jobquery {
+export interface IJobquery {
   _id: Object
   content: String
   date: Date
-  user: User
+  user: IUser
 }
 
-export interface User {
+export interface IUser {
   _id: Object
   username: String
   passwordHash: String
-  jobQueries: [Jobquery]
-  conversations: [Conversation]
+  jobQueries: [IJobquery]
+  conversations: [IConversation]
+}
+
+export interface IToken {
+  value: String
 }

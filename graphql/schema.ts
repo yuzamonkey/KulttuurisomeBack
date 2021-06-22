@@ -35,10 +35,9 @@ const typeDefs = gql`
   }
 
   type Query {
-    queryCount: Int!
-    allQueries: [Jobquery]
+    allJobqueries: [Jobquery]
     allUsers: [User]
-    findQueries(content: String!): [Jobquery],
+    findJobqueries(content: String!): [Jobquery],
     findUser(id: ID!): User
     allConversations: [Conversation]
     findConversation(id: ID!): Conversation
@@ -54,7 +53,7 @@ const typeDefs = gql`
       username: String!
       password: String!
     ): Token
-    createQuery(
+    createJobquery(
       content: String!
     ): Jobquery
     createConversation(
