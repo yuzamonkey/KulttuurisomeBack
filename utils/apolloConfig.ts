@@ -47,7 +47,7 @@ const server = new ApolloServer({
       return null
     }
   },
-  playground: true
+  playground: process.env.NODE_ENV !== 'production' ? true : false
 })
 
 

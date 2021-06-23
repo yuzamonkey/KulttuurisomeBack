@@ -4,11 +4,12 @@
   "description": "Backend for Kulttuurisome project",
   "main": "index.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "NODE_ENV=production tsc",
     "start": "NODE_ENV=production node build/index.js",
     "ts-start": "NODE_ENV=production ts-node index.ts",
     "dev": "NODE_ENV=development ts-node-dev index.ts",
-    "test": "NODE_ENV=test jest --verbose --runInBand"
+    "test": "NODE_ENV=test jest --verbose --runInBand",
+    "cp-front": "rm -rf public && cp -r ../frontend/build/ public/"
   },
   "repository": {
     "type": "git",
