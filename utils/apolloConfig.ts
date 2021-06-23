@@ -14,7 +14,9 @@ const JWT_SECRET = process.env.JWT_SECRET
 
 const app = express()
 
-// TODO, maybe not optimal for browser caching
+// TODO, 
+// maybe not optimal for browser caching
+// refreshing page causes problems with url
 const frontendRoutes = [
   '/', 
   '/signin', 
