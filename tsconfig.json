@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2020",
+    "outDir": "build/",
+    "module": "commonjs",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -8,6 +10,7 @@
     "noImplicitAny": true,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "skipLibCheck": true
   }
 }
