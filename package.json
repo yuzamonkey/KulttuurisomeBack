@@ -22,6 +22,7 @@
   "homepage": "https://github.com/yuzamonkey/KulttuurisomeBack#readme",
   "dependencies": {
     "apollo-server": "^2.25.1",
+    "apollo-server-express": "^2.25.2",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
@@ -33,6 +34,7 @@
     "ts-node": "^10.0.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.12",
     "@types/jest": "^26.0.23",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^15.12.2",
