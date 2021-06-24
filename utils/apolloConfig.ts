@@ -1,40 +1,17 @@
-export { }; //https://medium.com/@muravitskiy.mail/cannot-redeclare-block-scoped-variable-varname-how-to-fix-b1c3d9cc8206
+//export { }; //https://medium.com/@muravitskiy.mail/cannot-redeclare-block-scoped-variable-varname-how-to-fix-b1c3d9cc8206
 
 require('dotenv').config()
-const jwt = require('jsonwebtoken')
-
-const express = require('express')
-const { ApolloServer } = require('apollo-server-express')
 
 const typeDefs = require('../graphql/schema')
 const resolvers = require('../graphql/resolvers')
 
 const User = require('../models/user');
+
+const jwt = require('jsonwebtoken')
 const JWT_SECRET = process.env.JWT_SECRET
 
-const app = express()
-
-// TODO, 
-// maybe not optimal for browser caching
-// refreshing page causes problems with url
-const frontendRoutes = [
-  '/', 
-  '/signin', 
-  '/signup', 
-  '/messages', 
-  '/messages/:id', 
-  '/jobmarket/queries',
-  '/jobmarket/sendquery',
-  '/jobmarket/myqueries',
-]
-frontendRoutes.forEach(route => app.use(route, express.static("public")))
-
-//app.use("/", express.static("public"));
-
-const server = new ApolloServer({
-  typeDefs, //sovelluksen GQL-skeema
-  resolvers, //resolverit, eli koodi joka määrittelee miten kyselyihin vastataan
-  context: async ({ req }: any) => { //An object (or a function that creates an object) that's passed to every resolver that executes for a particular operation
+const createAuthorizationContext = () => {
+  const context = async ({ req }: any): Promise<{currentUser: any}|null> => { //An object (or a function that creates an object) that's passed to every resolver that executes for a particular operation
     const auth = req ? req.headers.authorization : null
     if (auth && auth.toLowerCase().startsWith('bearer ')) {
       const decodedToken = jwt.verify(
@@ -48,24 +25,15 @@ const server = new ApolloServer({
     } else {
       return null
     }
-  },
-  playground: process.env.NODE_ENV !== 'production' ? true : false
-})
+  }
+  return context
+}
 
-
-server.applyMiddleware({ app });
-
-const PORT = process.env.PORT || 5000
-// app.listen(PORT).then(({ url }: any) => {
-//   console.log("PORT:", PORT )
-//   console.log(`Server ready at ${url}`)
-// })
-
-app.listen({ port: PORT }, () =>
-  console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`)
-)
-
-module.exports = {
-  app,
-  server
+export const createConfig = (context = createAuthorizationContext()) => {
+  return {
+    typeDefs, //sovelluksen GQL-skeema
+    resolvers, //resolverit, eli koodi joka määrittelee miten kyselyihin vastataan
+    context,
+    playground: process.env.NODE_ENV !== 'production' ? true : false
+  }
 }

@@ -34,6 +34,10 @@ const typeDefs = gql`
     value: String!
   }
 
+  type Debug {
+    value: String
+  }
+
   type Query {
     allJobqueries: [Jobquery]
     allUsers: [User]
@@ -41,6 +45,7 @@ const typeDefs = gql`
     findUser(id: ID!): User
     allConversations: [Conversation]
     findConversation(id: ID!): Conversation
+    getDebugValues: Debug
     me: User,
   }
 
